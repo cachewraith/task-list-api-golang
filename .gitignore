@@ -1,5 +1,9 @@
 # Environment variables
 .env
+.env.prod
+.env.*
+!.env.example
+!.env.prod.example
 
 # Go build artifacts
 *.exe

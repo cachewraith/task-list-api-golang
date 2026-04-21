@@ -1,0 +1,71 @@
+# Local/Development Environment
+# Usage: docker-compose up -d
+
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: todo-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-todo_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-todo_password}
+      POSTGRES_DB: ${DB_NAME:-todo_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-todo_user} -d ${DB_NAME:-todo_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - todo-network-dev
+
+  # Go API Application (Development with hot reload)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: todo-api-dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${SERVER_PORT:-8080}:8080"  # Dev runs on 8080 by default
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-todo_db}
+      DB_USER: ${DB_USER:-todo_user}
+      DB_PASSWORD: ${DB_PASSWORD:-todo_password}
+      DB_SSLMODE: disable
+      SERVER_PORT: 8080
+      SERVER_TIMEOUT: ${SERVER_TIMEOUT:-30}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-this}
+      ENV: development
+    volumes:
+      # Mount source code for hot reload during development
+      - .:/app
+      # Use named volume for go modules to persist between restarts
+      - go_mod_cache:/go/pkg/mod
+    networks:
+      - todo-network-dev
+    # Override entrypoint to use air for hot reload (optional)
+    # Remove this if you don't want hot reload
+    command: go run ./cmd/api/main.go
+
+volumes:
+  postgres_data_dev:
+    driver: local
+  go_mod_cache:
+    driver: local
+
+networks:
+  todo-network-dev:
+    driver: bridge

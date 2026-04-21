@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/example/todo-api/internal/domain"
-	"github.com/example/todo-api/internal/service"
-	"github.com/example/todo-api/pkg/logger"
-	"github.com/example/todo-api/pkg/response"
+	"github.com/cachewraith/task-list-api-golang/internal/domain"
+	"github.com/cachewraith/task-list-api-golang/internal/service"
+	"github.com/cachewraith/task-list-api-golang/pkg/logger"
+	"github.com/cachewraith/task-list-api-golang/pkg/response"
 	"github.com/go-chi/chi/v5"
 )
 

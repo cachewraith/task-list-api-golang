@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/example/todo-api/pkg/logger"
-	"github.com/example/todo-api/pkg/response"
+	"github.com/cachewraith/task-list-api-golang/pkg/logger"
+	"github.com/cachewraith/task-list-api-golang/pkg/response"
 	"github.com/go-chi/chi/v5"
 )
 

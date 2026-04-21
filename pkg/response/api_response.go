@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/example/todo-api/internal/domain"
+	"github.com/cachewraith/task-list-api-golang/internal/domain"
 )
 
 // Response is the standard API response structure

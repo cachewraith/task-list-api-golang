@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/example/todo-api/internal/config"
-	"github.com/example/todo-api/internal/handler"
-	appmiddleware "github.com/example/todo-api/internal/middleware"
-	"github.com/example/todo-api/internal/repository/postgres"
-	"github.com/example/todo-api/internal/service"
-	"github.com/example/todo-api/pkg/logger"
-	"github.com/example/todo-api/pkg/notifier"
-	"github.com/example/todo-api/pkg/response"
+	"github.com/cachewraith/task-list-api-golang/internal/config"
+	"github.com/cachewraith/task-list-api-golang/internal/handler"
+	appmiddleware "github.com/cachewraith/task-list-api-golang/internal/middleware"
+	"github.com/cachewraith/task-list-api-golang/internal/repository/postgres"
+	"github.com/cachewraith/task-list-api-golang/internal/service"
+	"github.com/cachewraith/task-list-api-golang/pkg/logger"
+	"github.com/cachewraith/task-list-api-golang/pkg/notifier"
+	"github.com/cachewraith/task-list-api-golang/pkg/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -90,6 +90,7 @@ func main() {
 	// Middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(appmiddleware.Cors())
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Timeout(cfg.Server.Timeout))
 	r.Use(middleware.SetHeader("Content-Type", "application/json"))
