@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/example/todo-api/pkg/logger"
+	"github.com/cachewraith/task-list-api-golang/pkg/logger"
 )
 
 // TelegramNotifier sends log alerts to Telegram

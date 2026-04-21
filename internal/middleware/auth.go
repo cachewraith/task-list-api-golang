@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/example/todo-api/internal/service"
-	"github.com/example/todo-api/pkg/response"
+	"github.com/cachewraith/task-list-api-golang/internal/service"
+	"github.com/cachewraith/task-list-api-golang/pkg/response"
 )
 
 // contextKey is a type for context keys

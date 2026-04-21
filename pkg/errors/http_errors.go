@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/example/todo-api/internal/domain"
+	"github.com/cachewraith/task-list-api-golang/internal/domain"
 )
 
 // HTTPError represents an HTTP error response

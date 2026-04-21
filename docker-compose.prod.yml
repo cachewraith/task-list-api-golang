@@ -1,0 +1,118 @@
+# Production Environment
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Or: docker-compose -f docker-compose.prod.yml up -d (if standalone)
+
+version: "3.8"
+
+services:
+  # PostgreSQL Database - Production
+  postgres:
+    image: postgres:14-alpine
+    container_name: todo-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    # Security: Don't expose postgres port publicly in real production
+    # Remove 'ports' section and use internal network only
+    # Or restrict to specific IP:
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - todo-network-prod
+    # Resource limits (optional, uncomment if needed)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+
+  # Go API Application - Production
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: todo-api-prod
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${SERVER_PORT:-8090}:8080"  # Prod runs on 8090 by default (change in .env.prod)
+    environment:
+      # These are loaded from .env.prod file
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSLMODE: ${DB_SSLMODE:-require}
+      SERVER_PORT: 8080
+      SERVER_TIMEOUT: ${SERVER_TIMEOUT:-30}
+      JWT_SECRET: ${JWT_SECRET}
+      ENV: production
+      # Optional: Telegram alerts
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_GROUP_ID: ${TELEGRAM_GROUP_ID:-}
+      TELEGRAM_THREAD_ID: ${TELEGRAM_THREAD_ID:-}
+    networks:
+      - todo-network-prod
+    # Security: Read-only root filesystem
+    read_only: true
+    # Security: No new privileges
+    security_opt:
+      - no-new-privileges:true
+    # Resource limits (optional, uncomment if needed)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.5'
+    #       memory: 128M
+    #     reservations:
+    #       cpus: '0.25'
+    #       memory: 64M
+
+  # Migration service - run once to apply SQL migrations
+  # Usage: docker compose -f docker-compose.prod.yml --env-file .env.prod --profile migrate run --rm migrate
+  migrate:
+    image: postgres:14-alpine
+    container_name: todo-migrate-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: ${DB_NAME}
+      PGUSER: ${DB_USER}
+      PGPASSWORD: ${DB_PASSWORD}
+    command: >
+      sh -c 'echo "Running migrations..." && for f in /migrations/*.sql; do echo "Applying: $$f"; psql -f "$$f"; done && echo "Migrations complete!"'
+    networks:
+      - todo-network-prod
+    profiles: ["migrate"]
+
+volumes:
+  postgres_data_prod:
+    driver: local
+
+networks:
+  todo-network-prod:
+    driver: bridge

@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/example/todo-api/internal/domain"
+	"github.com/cachewraith/task-list-api-golang/internal/domain"
 	"github.com/google/uuid"
 )
 

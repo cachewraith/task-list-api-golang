@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/example/todo-api/internal/domain"
-	"github.com/example/todo-api/internal/repository"
+	"github.com/cachewraith/task-list-api-golang/internal/domain"
+	"github.com/cachewraith/task-list-api-golang/internal/repository"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

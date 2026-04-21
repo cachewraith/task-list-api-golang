@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/example/todo-api/internal/domain"
-	"github.com/example/todo-api/internal/repository"
-	"github.com/example/todo-api/pkg/logger"
+	"github.com/cachewraith/task-list-api-golang/internal/domain"
+	"github.com/cachewraith/task-list-api-golang/internal/repository"
+	"github.com/cachewraith/task-list-api-golang/pkg/logger"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
